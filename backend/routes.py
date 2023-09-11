@@ -1,5 +1,18 @@
-from flask import render_template, make_response, jsonify, abort, request
-from backend import app, db
+import json
+import requests
+
+from flask import (
+    render_template,
+    make_response,
+    jsonify,
+    abort,
+    request,
+    url_for,
+    session,
+    redirect,
+)
+
+from backend import app, db, orders_api_auth
 from backend.models import Customer, Order
 
 
@@ -7,7 +20,46 @@ from backend.models import Customer, Order
 @app.route("/index")
 def index():
     user = {"username": "jimmie"}
-    return render_template("index.html", title="Home", user=user)
+    return render_template(
+        "index.html",
+        title="Home",
+        user=user,
+        session=session.get("user"),
+        pretty=json.dumps(
+            session.get("user"),
+            indent=4,
+        ),
+    )
+
+
+# login + logout endpoints
+@app.route("/login")
+def login():
+    return orders_api_auth.authorize_redirect(
+        redirect_uri=url_for("google_callback", _external=True)
+    )
+
+
+@app.route("/google-login")
+def google_callback():
+    token = orders_api_auth.authorize_access_token()
+    personDataUrl = (
+        "https://people.googleapis.com/v1/people/me?personFields=phoneNumbers"
+    )
+    personData = requests.get(
+        personDataUrl, headers={"Authorization": f"Bearer {token['access_token']}"}
+    ).json()
+
+    token["personData"] = personData
+    session["user"] = token
+
+    return redirect(url_for("index"))
+
+
+@app.route("/logout")
+def logout():
+    session.pop("user")
+    return redirect(url_for("index"))
 
 
 # Customer Endpoints
@@ -161,6 +213,7 @@ def delete_order(order_id):
     return jsonify({"message": "Order not found"}), 404
 
 
+# Error Endpoints
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({"error": "Not Found"}), 404)

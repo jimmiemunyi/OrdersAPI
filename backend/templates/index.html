@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Hi, {{ user.username }}!</h1>
+{% if session %}
+<div>
+    <pre>{{pretty}}</pre>
+</div>
+{% else %}
+<div>
+    <p>Hello, Stranger! Kindly log in to continue</p>
+</div>
+{% endif %}
 {% endblock %}

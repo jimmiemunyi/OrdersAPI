@@ -2,9 +2,11 @@ import os
 
 
 class Config(object):
-    # to be removed in production
     SECRET_KEY = os.environ.get("SECRET_KEY") or "development-testing"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    OAUTH2_CLIENT_ID = os.environ.get("OAUTH2_CLIENT_ID")
+    OAUTH2_CLIENT_SECRET = os.environ.get("OAUTH2_CLIENT_SECRET")
+    OAUTH2_META_URL = os.environ.get("OAUTH2_META_URL")
 
 
 class DevelopmentConfig(Config):
