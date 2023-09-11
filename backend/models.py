@@ -11,9 +11,6 @@ class Customer(db.Model):
     # Define a relationship with orders
     orders = db.relationship("Order", backref="customer", lazy="dynamic")
 
-    # def __init__(self, name):
-    #     self.name = name
-
     def __repr__(self):
         return f"<User {self.name}>"
 
@@ -26,11 +23,9 @@ class Order(db.Model):
     item = db.Column(db.String(255), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
-    # def __init__(self, customer, item, amount):
-    #     self.customer = customer
-    #     self.item = item
-    #     self.amount = amount
+    updated = db.Column(
+        db.DateTime, index=True, default=datetime.utcnow, onupdate=datetime.utcnow
+    )  # The Date of the Instance Update => Changed with Every Update
 
     def __repr__(self):
         return f"<Order {self.item} by Customer {self.customer}>"
