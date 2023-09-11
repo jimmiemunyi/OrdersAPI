@@ -12,7 +12,7 @@ class Customer(db.Model):
     orders = db.relationship("Order", backref="customer", lazy="dynamic")
 
     def __repr__(self):
-        return f"<User {self.name}>"
+        return f"<Customer {self.name}>"
 
 
 class Order(db.Model):
