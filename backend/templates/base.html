@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+
+<head>
+    {% if title %}
+    <title>{{ title }} - Microblog</title>
+    {% else %}
+    <title>Welcome to Microblog</title>
+    {% endif %}
+</head>
+
+<body>
+    <div>
+        Orders API:
+        <a href="{{ url_for('index') }}">Home</a>
+    </div>
+    <hr>
+    {% block content %}{% endblock %}
+</body>
+
+</html>
