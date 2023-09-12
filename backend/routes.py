@@ -10,26 +10,64 @@ from flask import (
     url_for,
     session,
     redirect,
+    flash,
 )
 
 from backend import app, db, orders_api_auth
 from backend.models import Customer, Order
+from backend.forms import UpdateCustomerForm
 
 
-@app.route("/")
-@app.route("/index")
+@app.route("/, methods=['GET', 'POST']")
+@app.route("/index", methods=["GET", "POST"])
 def index():
-    user = {"username": "jimmie"}
-    return render_template(
-        "index.html",
-        title="Home",
-        user=user,
-        session=session.get("user"),
-        pretty=json.dumps(
-            session.get("user"),
-            indent=4,
-        ),
-    )
+    sesison_info = session.get("user")
+    if sesison_info:  # logged in users.
+        name = sesison_info["userinfo"]["name"]
+        email = sesison_info["userinfo"]["email"]
+        contact = "NULL"
+        if "phoneNumbers" in sesison_info["personData"]:
+            contact = sesison_info["personData"]["phoneNumbers"][0]["canonicalForm"]
+            contact = contact.split("+")[-1]
+
+        # database logic
+        customer = Customer.query.filter_by(email=email).first()
+        if not customer:
+            customer = Customer(name=name, email=email, contact=contact)
+            db.session.add(customer)
+            db.session.commit()
+
+        # update customer
+        form = UpdateCustomerForm()
+        if form.validate_on_submit():
+            # Extract form data
+            name = form.name.data
+            email = form.email.data
+            contact = form.contact.data
+
+            # send PUT request to our API to update the data
+            data = {"name": name, "email": email, "contact": contact}
+            headers = {"Content-Type": "application/json"}
+            response = requests.put(
+                f'http://localhost:5000/{url_for("update_customer", customer_id=customer.id)}',
+                data=json.dumps(data),
+                headers=headers,
+            )
+            if response.status_code == 201:
+                flash("Records updated successfully")
+            else:
+                flash("Failed to update customer", category="danger")
+
+            return redirect(url_for("index"))
+
+        return render_template(
+            "index.html",
+            title="Home",
+            session=sesison_info,
+            customer=customer,
+            form=form,
+        )
+    return render_template("index.html", title="Home", session=sesison_info)
 
 
 # login + logout endpoints
@@ -50,7 +88,7 @@ def google_callback():
         personDataUrl, headers={"Authorization": f"Bearer {token['access_token']}"}
     ).json()
 
-    token["personData"] = personData  # handle phone numbers
+    token["personData"] = personData  # contacts from Google are located in personData
     session["user"] = token
 
     return redirect(url_for("index"))
@@ -62,6 +100,12 @@ def logout():
     return redirect(url_for("index"))
 
 
+@app.route("/orders")
+def orders():
+    return render_template("orders.html", title="Orders")
+
+
+# API Endpoints
 # Customer Endpoints
 @app.route("/api/v1/customers", methods=["GET"])
 def get_customers():

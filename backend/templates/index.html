@@ -3,11 +3,47 @@
 {% block content %}
 {% if session %}
 <div>
-    <pre>{{pretty}}</pre>
+    <h4>Profile</h4>
+    {% if customer.contact == 'NULL' %}
+    <p>Kindly update your <b>Contact</b> details in order to make orders.</p>
+    {% endif %}
+    <table id="data" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.contact }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h4>Update Profile</h4>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(size=32) }}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=32) }}
+        </p>
+        <p>
+            {{ form.contact.label }}<br>
+            {{ form.contact(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 </div>
 {% else %}
 <div>
-    <p>Hello, Stranger! Kindly log in to continue</p>
+    <p>Hello, Stranger! Kindly log with Google to continue.</p>
 </div>
 {% endif %}
 {% endblock %}
