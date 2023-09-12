@@ -50,7 +50,7 @@ def google_callback():
         personDataUrl, headers={"Authorization": f"Bearer {token['access_token']}"}
     ).json()
 
-    token["personData"] = personData
+    token["personData"] = personData  # handle phone numbers
     session["user"] = token
 
     return redirect(url_for("index"))
@@ -66,7 +66,10 @@ def logout():
 @app.route("/api/v1/customers", methods=["GET"])
 def get_customers():
     customers = Customer.query.all()
-    customer_list = [{"id": c.id, "name": c.name} for c in customers]
+    customer_list = [
+        {"id": c.id, "name": c.name, "email": c.email, "contact": c.contact}
+        for c in customers
+    ]
     return jsonify(customer_list), 201
 
 
@@ -74,7 +77,17 @@ def get_customers():
 def get_customer(customer_id):
     customer = Customer.query.get(customer_id)
     if customer:
-        return jsonify({"id": customer.id, "name": customer.name}), 200
+        return (
+            jsonify(
+                {
+                    "id": customer.id,
+                    "name": customer.name,
+                    "email": customer.email,
+                    "contact": customer.contact,
+                }
+            ),
+            200,
+        )
     abort(404)
 
 
@@ -83,14 +96,31 @@ def create_customer():
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided!"}), 400
-    if "name" not in data:
-        return jsonify({"error": "Missing name field in the data provided!"}), 400
-    customer = {"name": data.get("name")}
-    new_customer = Customer(name=customer["name"])
+    required_fields = ["name", "email", "contact"]
+    for field in required_fields:
+        if field not in data:
+            return (
+                jsonify({"error": f"Missing {field} field in the data provided!"}),
+                400,
+            )
+    customer = {f"{field}": data.get(f"{field}") for field in required_fields}
+    new_customer = Customer(
+        name=customer["name"], email=customer["email"], contact=customer["contact"]
+    )
     db.session.add(new_customer)
     db.session.commit()
 
-    return jsonify({"id": new_customer.id, "name": new_customer.name}), 201
+    return (
+        jsonify(
+            {
+                "id": new_customer.id,
+                "name": new_customer.name,
+                "email": new_customer.email,
+                "contact": new_customer.contact,
+            }
+        ),
+        201,
+    )
 
 
 @app.route("/api/v1/customers/<int:customer_id>", methods=["PUT"])
@@ -98,15 +128,31 @@ def update_customer(customer_id):
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided!"}), 400
-    if "name" not in data:
-        return jsonify({"error": "Missing name field in the data provided!"}), 400
+    required_fields = ["name", "email", "contact"]
+    for field in required_fields:
+        if field not in data:
+            return (
+                jsonify({"error": f"Missing {field} field in the data provided!"}),
+                400,
+            )
     customer = Customer.query.get(customer_id)
     if customer:
         customer.name = data["name"]
+        customer.email = data["email"]
+        customer.contact = data["contact"]
         db.session.commit()
-        return jsonify({"id": customer.id, "name": customer.name}), 201
-    else:
-        abort(404)
+        return (
+            jsonify(
+                {
+                    "id": customer.id,
+                    "name": customer.name,
+                    "email": customer.email,
+                    "contact": customer.contact,
+                }
+            ),
+            201,
+        )
+    return jsonify({"message": "Customer not found"}), 404
 
 
 @app.route("/api/v1/customers/<int:customer_id>", methods=["DELETE"])
