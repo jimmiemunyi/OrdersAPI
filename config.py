@@ -7,6 +7,9 @@ class Config(object):
     OAUTH2_CLIENT_ID = os.environ.get("OAUTH2_CLIENT_ID")
     OAUTH2_CLIENT_SECRET = os.environ.get("OAUTH2_CLIENT_SECRET")
     OAUTH2_META_URL = os.environ.get("OAUTH2_META_URL")
+    AFRICASTALKING_USERNAME = os.environ.get("AFRICASTALKING_USERNAME")
+    AFRICASTALKING_API_KEY = os.environ.get("AFRICASTALKING_API_KEY")
+    AFRICASTALKING_SENDER_ID = os.environ.get("AFRICASTALKING_SENDER_ID")
 
 
 class DevelopmentConfig(Config):

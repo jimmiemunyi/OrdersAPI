@@ -13,12 +13,12 @@ from flask import (
     flash,
 )
 
-from backend import app, db, orders_api_auth
+from backend import app, db, orders_api_auth, sms_service
 from backend.models import Customer, Order
 from backend.forms import UpdateCustomerForm, MakeOrderForm
 
 
-@app.route("/, methods=['GET', 'POST']")
+@app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
 def index():
     sesison_info = session.get("user")
@@ -124,6 +124,16 @@ def orders():
             )
             if response.status_code == 201:
                 flash("Order made successfully")
+                # try and send the order confirmation SMS
+                try:
+                    message = f"Thank you {customer.name} for making an order of {item} for amount Ksh.{amount}"
+                    contact = f"+{customer.contact}"
+                    sender = app.config.get("AFRICASTALKING_SENDER_ID")
+                    response = sms_service.send(message, [contact], sender)
+                    print(f"[MESSAGE RESPONSE]: {response}")
+                except Exception as e:
+                    print(f"[MESSAGE ERROR]: {e}")
+
             else:
                 flash("Failed to make order", category="danger")
 

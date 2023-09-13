@@ -1,5 +1,6 @@
 import os
 
+import africastalking
 from flask import Flask
 from config import config
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +14,14 @@ app.config.from_object(config[config_mode])
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+
+africastalking.initialize(
+    username=app.config.get("AFRICASTALKING_USERNAME"),
+    api_key=app.config.get("AFRICASTALKING_API_KEY"),
+)
+
+sms_service = africastalking.SMS
 
 oauth = OAuth(app)
 orders_api_auth = oauth.register(
