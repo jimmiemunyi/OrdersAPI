@@ -6,7 +6,9 @@ from wtforms import StringField, SubmitField, FloatField
 class UpdateCustomerForm(FlaskForm):
     name = StringField("Name")
     email = StringField("Email")
-    contact = StringField("Contact")
+    contact = StringField(
+        "Contact (2547XXXXXXXX)",
+    )
     submit = SubmitField("Update Profile")
 
 

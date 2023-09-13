@@ -25,8 +25,9 @@ def index():
     if sesison_info:  # logged in users.
         name = sesison_info["userinfo"]["name"]
         email = sesison_info["userinfo"]["email"]
-        contact = "NULL"
+        contact = "NULL"  # default if we cannot extract the contact from Google
         if "phoneNumbers" in sesison_info["personData"]:
+            # attempt to extract contact from Google
             contact = sesison_info["personData"]["phoneNumbers"][0]["canonicalForm"]
             contact = contact.split("+")[-1]
 
