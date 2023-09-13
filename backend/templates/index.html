@@ -6,8 +6,10 @@
     <h4>Profile</h4>
     {% if customer.contact == 'NULL' %}
     <p>Kindly update your <b>Contact</b> details in order to make orders.</p>
+    {% else %}
+    <p>You can make <a href="{{url_for('orders')}}">orders</a></p>
     {% endif %}
-    <table id="data" class="table table-striped">
+    <table id="customer" class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>

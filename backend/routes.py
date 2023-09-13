@@ -15,7 +15,7 @@ from flask import (
 
 from backend import app, db, orders_api_auth
 from backend.models import Customer, Order
-from backend.forms import UpdateCustomerForm
+from backend.forms import UpdateCustomerForm, MakeOrderForm
 
 
 @app.route("/, methods=['GET', 'POST']")
@@ -100,9 +100,44 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route("/orders")
+@app.route("/orders", methods=["GET", "POST"])
 def orders():
-    return render_template("orders.html", title="Orders")
+    sesison_info = session.get("user")
+    if sesison_info:
+        email = sesison_info["userinfo"]["email"]
+        customer = Customer.query.filter_by(email=email).first()
+        orders = Order.query.filter_by(customer_id=customer.id).all()
+
+        form = MakeOrderForm()
+        if form.validate_on_submit():
+            # Extract form data
+            item = form.item.data
+            amount = round(float(form.amount.data), 2)
+
+            # send PUT request to our API to update the data
+            data = {"customer_id": customer.id, "item": item, "amount": amount}
+            headers = {"Content-Type": "application/json"}
+            response = requests.post(
+                f'http://localhost:5000/{url_for("create_order")}',
+                data=json.dumps(data),
+                headers=headers,
+            )
+            if response.status_code == 201:
+                flash("Order made successfully")
+            else:
+                flash("Failed to make order", category="danger")
+
+            return redirect(url_for("orders"))
+
+        return render_template(
+            "orders.html",
+            title="Orders",
+            session=sesison_info,
+            orders=orders,
+            form=form,
+        )
+
+    return render_template("orders.html", title="Orders", session=sesison_info)
 
 
 # API Endpoints

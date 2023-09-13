@@ -1,7 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if session %}
 <div>
-    <p>Orders</p>
+    <h4>Orders</h4>
+    <p>Your past orders</p>
+    <table id="orders" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Amount (Ksh)</th>
+                <th>Time (YYYY-MM-DD H:M)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.item }}</td>
+                <td>{{ order.amount }}</td>
+                <td>{{ order.time.strftime('%Y-%m-%d %H:%m') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h4>Make an Order</h4>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.item.label }}<br>
+            {{ form.item(size=32) }}
+        </p>
+        <p>
+            {{ form.amount.label }}<br>
+            {{ form.amount(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 </div>
+{% else %}
+<div>
+    <p>Hello, Stranger! You cannot make orders until you log in</p>
+</div>
+{% endif %}
 {% endblock %}
