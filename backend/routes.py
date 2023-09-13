@@ -11,15 +11,19 @@ from flask import (
     session,
     redirect,
     flash,
+    Blueprint,
+    current_app,
 )
 
-from backend import app, db, orders_api_auth, sms_service
+from backend import db
 from backend.models import Customer, Order
 from backend.forms import UpdateCustomerForm, MakeOrderForm
 
+bp = Blueprint("main", __name__)
 
-@app.route("/", methods=["GET", "POST"])
-@app.route("/index", methods=["GET", "POST"])
+
+@bp.route("/", methods=["GET", "POST"])
+@bp.route("/index", methods=["GET", "POST"])
 def index():
     sesison_info = session.get("user")
     if sesison_info:  # logged in users.
@@ -50,7 +54,7 @@ def index():
             data = {"name": name, "email": email, "contact": contact}
             headers = {"Content-Type": "application/json"}
             response = requests.put(
-                f'http://localhost:5000/{url_for("update_customer", customer_id=customer.id)}',
+                f'http://localhost:5000/{url_for("main.update_customer", customer_id=customer.id)}',
                 data=json.dumps(data),
                 headers=headers,
             )
@@ -59,7 +63,7 @@ def index():
             else:
                 flash("Failed to update customer", category="danger")
 
-            return redirect(url_for("index"))
+            return redirect(url_for("main.index"))
 
         return render_template(
             "index.html",
@@ -72,16 +76,16 @@ def index():
 
 
 # login + logout endpoints
-@app.route("/login")
+@bp.route("/login")
 def login():
-    return orders_api_auth.authorize_redirect(
-        redirect_uri=url_for("google_callback", _external=True)
+    return current_app.orders_api_auth.authorize_redirect(
+        redirect_uri=url_for("main.google_callback", _external=True)
     )
 
 
-@app.route("/google-login")
+@bp.route("/google-login")
 def google_callback():
-    token = orders_api_auth.authorize_access_token()
+    token = current_app.orders_api_auth.authorize_access_token()
     personDataUrl = (
         "https://people.googleapis.com/v1/people/me?personFields=phoneNumbers"
     )
@@ -92,16 +96,16 @@ def google_callback():
     token["personData"] = personData  # contacts from Google are located in personData
     session["user"] = token
 
-    return redirect(url_for("index"))
+    return redirect(url_for("main.index"))
 
 
-@app.route("/logout")
+@bp.route("/logout")
 def logout():
     session.pop("user")
-    return redirect(url_for("index"))
+    return redirect(url_for("main.index"))
 
 
-@app.route("/orders", methods=["GET", "POST"])
+@bp.route("/orders", methods=["GET", "POST"])
 def orders():
     sesison_info = session.get("user")
     if sesison_info:
@@ -119,7 +123,7 @@ def orders():
             data = {"customer_id": customer.id, "item": item, "amount": amount}
             headers = {"Content-Type": "application/json"}
             response = requests.post(
-                f'http://localhost:5000/{url_for("create_order")}',
+                f'http://localhost:5000/{url_for("main.create_order")}',
                 data=json.dumps(data),
                 headers=headers,
             )
@@ -129,8 +133,8 @@ def orders():
                 try:
                     message = f"Thank you {customer.name} for making an order of {item} for amount Ksh.{amount}"
                     contact = f"+{customer.contact}"
-                    sender = app.config.get("AFRICASTALKING_SENDER_ID")
-                    response = sms_service.send(message, [contact], sender)
+                    sender = current_app.config.get("AFRICASTALKING_SENDER_ID")
+                    response = current_app.sms_service.send(message, [contact], sender)
                     print(f"[MESSAGE RESPONSE]: {response}")
                 except Exception as e:
                     print(f"[MESSAGE ERROR]: {e}")
@@ -138,7 +142,7 @@ def orders():
             else:
                 flash("Failed to make order", category="danger")
 
-            return redirect(url_for("orders"))
+            return redirect(url_for("main.orders"))
 
         return render_template(
             "orders.html",
@@ -153,7 +157,7 @@ def orders():
 
 # API Endpoints
 # Customer Endpoints
-@app.route("/api/v1/customers", methods=["GET"])
+@bp.route("/api/v1/customers", methods=["GET"])
 def get_customers():
     customers = Customer.query.all()
     customer_list = [
@@ -163,7 +167,7 @@ def get_customers():
     return jsonify(customer_list), 201
 
 
-@app.route("/api/v1/customers/<int:customer_id>", methods=["GET"])
+@bp.route("/api/v1/customers/<int:customer_id>", methods=["GET"])
 def get_customer(customer_id):
     customer = Customer.query.get(customer_id)
     if customer:
@@ -181,7 +185,7 @@ def get_customer(customer_id):
     abort(404)
 
 
-@app.route("/api/v1/customers", methods=["POST"])
+@bp.route("/api/v1/customers", methods=["POST"])
 def create_customer():
     data = request.get_json()
     if not data:
@@ -213,7 +217,7 @@ def create_customer():
     )
 
 
-@app.route("/api/v1/customers/<int:customer_id>", methods=["PUT"])
+@bp.route("/api/v1/customers/<int:customer_id>", methods=["PUT"])
 def update_customer(customer_id):
     data = request.get_json()
     if not data:
@@ -245,7 +249,7 @@ def update_customer(customer_id):
     return jsonify({"message": "Customer not found"}), 404
 
 
-@app.route("/api/v1/customers/<int:customer_id>", methods=["DELETE"])
+@bp.route("/api/v1/customers/<int:customer_id>", methods=["DELETE"])
 def delete_customer(customer_id):
     customer = Customer.query.get(customer_id)
     if customer:
@@ -256,7 +260,7 @@ def delete_customer(customer_id):
 
 
 # Order Endpoints
-@app.route("/api/v1/orders", methods=["GET"])
+@bp.route("/api/v1/orders", methods=["GET"])
 def get_orders():
     orders = Order.query.all()
     order_list = [
@@ -272,7 +276,7 @@ def get_orders():
     return jsonify(order_list), 201
 
 
-@app.route("/api/v1/orders/<int:order_id>", methods=["GET"])
+@bp.route("/api/v1/orders/<int:order_id>", methods=["GET"])
 def get_order(order_id):
     order = Order.query.get(order_id)
     if order:
@@ -288,7 +292,7 @@ def get_order(order_id):
     return abort(404)
 
 
-@app.route("/api/v1/orders", methods=["POST"])
+@bp.route("/api/v1/orders", methods=["POST"])
 def create_order():
     data = request.get_json()
     if not data:
@@ -316,7 +320,7 @@ def create_order():
     )
 
 
-@app.route("/api/v1/orders/<int:order_id>", methods=["PUT"])
+@bp.route("/api/v1/orders/<int:order_id>", methods=["PUT"])
 def update_order(order_id):
     data = request.get_json()
     if not data:
@@ -339,7 +343,7 @@ def update_order(order_id):
     return jsonify({"message": "Order not found"}), 404
 
 
-@app.route("/api/v1/orders/<int:order_id>", methods=["DELETE"])
+@bp.route("/api/v1/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
     order = Order.query.get(order_id)
     if order:
@@ -350,6 +354,6 @@ def delete_order(order_id):
 
 
 # Error Endpoints
-@app.errorhandler(404)
+@bp.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({"error": "Not Found"}), 404)
