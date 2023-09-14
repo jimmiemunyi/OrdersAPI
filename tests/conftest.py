@@ -16,6 +16,7 @@ class TestingConfig(Config):
 def app():
     """An application for running tests"""
     _app = create_app(TestingConfig)
+    _app.config["WTF_CSRF_ENABLED"] = False
 
     with _app.app_context():
         # always starting with an empty DB
@@ -37,13 +38,3 @@ def app():
 @pytest.fixture(scope="function")
 def client(app):
     return app.test_client()
-
-
-# @pytest.fixture(scope="function")
-# def database(app):
-#     return app.db
-
-
-# @pytest.fixture(scope="function")
-# def testapp(app):
-#     return TestApp(app)

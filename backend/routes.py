@@ -54,7 +54,7 @@ def index():
             data = {"name": name, "email": email, "contact": contact}
             headers = {"Content-Type": "application/json"}
             response = requests.put(
-                f'http://localhost:5000/{url_for("main.update_customer", customer_id=customer.id)}',
+                f'{url_for("main.update_customer", customer_id=customer.id, _external=True)}',
                 data=json.dumps(data),
                 headers=headers,
             )

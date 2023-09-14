@@ -1,8 +1,6 @@
 # from flask import url_for, request
 import json
 
-from flask import jsonify
-
 from backend.models import Customer, Order
 from backend import db
 
@@ -16,10 +14,61 @@ def test_index(client):
     assert "<title>Home - Orders API</title>" in response.text
 
 
-# def test_login(client):
-#     response = client.get("/google-login", follow_redirects=True)
+def test_index_logged_in(client):
+    # assume we have the following session from logged in user
+    with client.session_transaction() as session:
+        session["user"] = {
+            "personData": {
+                "phoneNumbers": [
+                    {
+                        "canonicalForm": "+254712345678",
+                    }
+                ],
+            },
+            "userinfo": {
+                "email": "dummyname@email.com",
+                "name": "dummy name",
+            },
+        }
 
-#     assert response.request.path == "/index"
+    response = client.get("/")
+
+    assert response is not None
+    assert response.status_code == 200
+    assert "dummy name" in response.text
+
+
+def test_update_customer_form(client):
+    # c = Customer(name="dummy name", email="dummy@dummy.com", contact="contact")
+    # # add to database
+    # db.session.add(c)
+    # db.session.commit()
+    # we have to be logged in
+    with client.session_transaction() as session:
+        session["user"] = {
+            "personData": {
+                "phoneNumbers": [
+                    {
+                        "canonicalForm": "+254712345678",
+                    }
+                ],
+            },
+            "userinfo": {
+                "email": "dummyname@email.com",
+                "name": "dummy name",
+            },
+        }
+
+    data = {
+        "name": "dummy name",
+        "email": "dummyname@dummy.com",
+        "contact": "+254712345678",
+    }
+
+    response = client.post("/", data=data)
+
+    print(response.text)
+    print(response.status_code)
 
 
 def test_orders(client):
