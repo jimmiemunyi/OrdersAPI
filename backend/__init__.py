@@ -1,15 +1,22 @@
+import os
 import africastalking
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
 
+from config import DevelopmentConfig, ProductionConfig
+
 db = SQLAlchemy()
 migrate = Migrate()
 oauth = OAuth()
 
 
-def create_app(config=None):
+def create_app(config=DevelopmentConfig):
+    # use ProductionConfig if we are in production mode
+    if os.environ.get("CONFIG_MODE") == "production":
+        config = ProductionConfig
+
     app = Flask(__name__)
     app.config.from_object(config)
 
