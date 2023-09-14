@@ -93,7 +93,7 @@ def run_migrations_online():
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
-            compare_type=True,
+            # compare_type=True,
             process_revision_directives=process_revision_directives,
             **current_app.extensions["migrate"].configure_args
         )
