@@ -123,7 +123,7 @@ def orders():
             data = {"customer_id": customer.id, "item": item, "amount": amount}
             headers = {"Content-Type": "application/json"}
             response = requests.post(
-                f'http://localhost:5000/{url_for("main.create_order")}',
+                f'{url_for("main.create_order", _external=True)}',
                 data=json.dumps(data),
                 headers=headers,
             )

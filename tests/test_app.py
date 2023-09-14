@@ -20,3 +20,28 @@ def test_login(client):
     assert (
         "<p>You should be redirected automatically to the target URL:" in response.text
     )
+
+
+def test_logout(client):
+    # we have to be logged in
+    with client.session_transaction() as session:
+        session["user"] = {
+            "personData": {
+                "phoneNumbers": [
+                    {
+                        "canonicalForm": "+254712345678",
+                    }
+                ],
+            },
+            "userinfo": {
+                "email": "dummyname@email.com",
+                "name": "dummy name",
+            },
+        }
+
+    response = client.get("/logout")
+    assert response is not None
+    assert response.status_code == 302  # redirecting
+    assert (
+        "<p>You should be redirected automatically to the target URL:" in response.text
+    )
