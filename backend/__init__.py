@@ -1,4 +1,6 @@
 import os
+import logging
+
 import africastalking
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -40,6 +42,12 @@ def create_app(config=DevelopmentConfig):
         api_key=app.config.get("AFRICASTALKING_API_KEY"),
     )
     app.sms_service = africastalking.SMS
+
+    if not app.debug and not app.testing:
+        if app.config["LOG_TO_STDOUT"]:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setLevel(logging.INFO)
+            app.logger.addHandler(stream_handler)
 
     # register the blueprint
     from .routes import bp

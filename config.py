@@ -30,6 +30,7 @@ PROD_DB_URL = get_env_db_url("production")
 
 
 class Config(object):
+    LOG_TO_STDOUT = os.environ.get("LOG_TO_STDOUT")
     CONFIG_MODE = get_env_variable("CONFIG_MODE")
     SQLALCHEMY_DATABASE_URI = DEV_DB_URL
     SECRET_KEY = get_env_variable("SECRET_KEY") or "development-testing"
@@ -49,4 +50,6 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = PROD_DB_URL
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "").replace(
+        "postgres://", "postgresql://"
+    )
