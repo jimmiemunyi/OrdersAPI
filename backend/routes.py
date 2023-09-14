@@ -331,14 +331,17 @@ def update_order(order_id):
         order.item = data["item"]
         order.amount = data["amount"]
         db.session.commit()
-        return jsonify(
-            {
-                "id": order.id,
-                "customer_id": order.customer_id,
-                "item": order.item,
-                "amount": float(order.amount),
-                "time": order.updated,
-            }
+        return (
+            jsonify(
+                {
+                    "id": order.id,
+                    "customer_id": order.customer_id,
+                    "item": order.item,
+                    "amount": float(order.amount),
+                    "time": order.updated,
+                }
+            ),
+            201,
         )
     return jsonify({"message": "Order not found"}), 404
 
@@ -349,7 +352,7 @@ def delete_order(order_id):
     if order:
         db.session.delete(order)
         db.session.commit()
-        return jsonify({"message": "Order deleted"})
+        return jsonify({"message": "Order deleted"}), 200
     return jsonify({"message": "Order not found"}), 404
 
 

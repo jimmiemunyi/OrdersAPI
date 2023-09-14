@@ -1,5 +1,4 @@
 import pytest
-from webtest import TestApp
 
 from backend import create_app, db
 from config import Config
@@ -19,6 +18,8 @@ def app():
     _app = create_app(TestingConfig)
 
     with _app.app_context():
+        # always starting with an empty DB
+        db.drop_all()
         from backend.models import Order, Customer
 
         db.create_all()
@@ -31,6 +32,16 @@ def app():
     if str(db.engine.url) == TestingConfig.SQLALCHEMY_DATABASE_URI:
         db.drop_all()
     ctx.pop()
+
+
+@pytest.fixture(scope="function")
+def client(app):
+    return app.test_client()
+
+
+# @pytest.fixture(scope="function")
+# def database(app):
+#     return app.db
 
 
 # @pytest.fixture(scope="function")
