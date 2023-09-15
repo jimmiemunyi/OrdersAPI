@@ -6,12 +6,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
+from flasgger import Swagger
 
 from config import DevelopmentConfig, ProductionConfig
 
 db = SQLAlchemy()
 migrate = Migrate()
 oauth = OAuth()
+swagger = Swagger()
 
 
 def create_app(config=DevelopmentConfig):
@@ -26,6 +28,7 @@ def create_app(config=DevelopmentConfig):
     db.init_app(app)
     migrate.init_app(app, db)
     oauth.init_app(app)
+    swagger.init_app(app)
 
     app.orders_api_auth = oauth.register(
         name="OrdersAPI",

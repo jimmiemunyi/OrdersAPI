@@ -159,6 +159,13 @@ def orders():
 # Customer Endpoints
 @bp.route("/api/v1/customers", methods=["GET"])
 def get_customers():
+    """Get all customers present in the database
+    Specifications
+    ---
+    responses:
+      201:
+        description: Data for all the customers
+    """
     customers = Customer.query.all()
     customer_list = [
         {"id": c.id, "name": c.name, "email": c.email, "contact": c.contact}
@@ -169,6 +176,20 @@ def get_customers():
 
 @bp.route("/api/v1/customers/<int:customer_id>", methods=["GET"])
 def get_customer(customer_id):
+    """Get a specific customer from database
+    Specifications
+    ---
+    parameters:
+      - name: customer_id
+        in: customer id
+        type: int
+        required: true
+    responses:
+      200:
+        description: Data for the customer requested
+      404:
+        description: Customer does not exist in the database
+    """
     customer = Customer.query.get(customer_id)
     if customer:
         return (
@@ -187,6 +208,21 @@ def get_customer(customer_id):
 
 @bp.route("/api/v1/customers", methods=["POST"])
 def create_customer():
+    """Create a customer in the database
+    Specifications
+    ---
+    parameters:
+      - name: data
+        description: data for the customer
+        in: data
+        type: json
+        required: true
+    responses:
+      200:
+        description: Data for the customer created
+      400:
+        description: Missing some fields in the data you provided
+    """
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided!"}), 400
@@ -219,6 +255,26 @@ def create_customer():
 
 @bp.route("/api/v1/customers/<int:customer_id>", methods=["PUT"])
 def update_customer(customer_id):
+    """Update a customer in the database
+    Specifications
+    ---
+    parameters:
+      - name: customer_id
+        description: id for the customer to update
+        in: customer_id
+        type: int
+        required: true
+      - name: data
+        description: data for the customer
+        in: data
+        type: json
+        required: true
+    responses:
+      200:
+        description: Data for the customer updated
+      400:
+        description:  Missing some fields in the data you provided
+    """
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided!"}), 400
@@ -251,17 +307,39 @@ def update_customer(customer_id):
 
 @bp.route("/api/v1/customers/<int:customer_id>", methods=["DELETE"])
 def delete_customer(customer_id):
+    """Delete a customer in the database
+    Specifications
+    ---
+    parameters:
+      - name: customer_id
+        description: id for the customer to delete
+        in: data
+        type: int
+        required: true
+    responses:
+      201:
+        description: Customer deleted
+      400:
+        description: Customer not found
+    """
     customer = Customer.query.get(customer_id)
     if customer:
         db.session.delete(customer)
         db.session.commit()
-        return jsonify({"message": "Customer deleted"})
+        return jsonify({"message": "Customer deleted"}), 201
     return jsonify({"message": "Customer not found"}), 404
 
 
 # Order Endpoints
 @bp.route("/api/v1/orders", methods=["GET"])
 def get_orders():
+    """Get all customers present in the database
+    Specifications
+    ---
+    responses:
+      201:
+        description: Data for all the orders
+    """
     orders = Order.query.all()
     order_list = [
         {
@@ -278,22 +356,54 @@ def get_orders():
 
 @bp.route("/api/v1/orders/<int:order_id>", methods=["GET"])
 def get_order(order_id):
+    """Get a specific order from database
+    Specifications
+    ---
+    parameters:
+      - name: order_id
+        in: order id
+        type: int
+        required: true
+    responses:
+      200:
+        description: Data for the order requested
+      404:
+        description: Order does not exist in the database
+    """
     order = Order.query.get(order_id)
     if order:
-        return jsonify(
-            {
-                "id": order.id,
-                "customer_id": order.customer_id,
-                "item": order.item,
-                "amount": float(order.amount),
-                "time": order.time,
-            }
+        return (
+            jsonify(
+                {
+                    "id": order.id,
+                    "customer_id": order.customer_id,
+                    "item": order.item,
+                    "amount": float(order.amount),
+                    "time": order.time,
+                }
+            ),
+            200,
         )
     return abort(404)
 
 
 @bp.route("/api/v1/orders", methods=["POST"])
 def create_order():
+    """Create an order in the database
+    Specifications
+    ---
+    parameters:
+      - name: data
+        description: data for the order
+        in: data
+        type: json
+        required: true
+    responses:
+      201:
+        description: Data for the order created
+      400:
+        description: Missing some fields in the data you provided
+    """
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided!"}), 400
@@ -322,6 +432,26 @@ def create_order():
 
 @bp.route("/api/v1/orders/<int:order_id>", methods=["PUT"])
 def update_order(order_id):
+    """Update an order in the database
+    Specifications
+    ---
+    parameters:
+      - name: order_id
+        description: id for the order to update
+        in: order_id
+        type: int
+        required: true
+      - name: data
+        description: data for the order
+        in: data
+        type: json
+        required: true
+    responses:
+      200:
+        description: Data for the order updated
+      400:
+        description:  Missing some fields in the data you provided
+    """
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided!"}), 400
@@ -348,6 +478,21 @@ def update_order(order_id):
 
 @bp.route("/api/v1/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
+    """Delete an order in the database
+    Specifications
+    ---
+    parameters:
+      - name: order_id
+        description: id for the customer to delete
+        in: data
+        type: int
+        required: true
+    responses:
+      201:
+        description: Order deleted
+      400:
+        description: Order not found
+    """
     order = Order.query.get(order_id)
     if order:
         db.session.delete(order)

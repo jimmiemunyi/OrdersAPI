@@ -1,5 +1,6 @@
 # Orders API Documentation
 Deployed on Heroku - [link](https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/)
+API DOCS - [link](https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/apidocs)
 
 
 # Postgres
