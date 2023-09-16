@@ -43,7 +43,9 @@ jobs:
           done
 
       - name: Run tests
-        run: pytest tests/
+        run: |
+          flask run
+          pytest tests/
 
   deploy:
     name: Deploy to Heroku
