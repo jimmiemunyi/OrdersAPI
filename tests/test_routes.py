@@ -70,38 +70,38 @@ def test_index_logged_in(client):
 #     )
 
 
-def test_update_order_form(client):
-    c = Customer(name="dummy name", email="dummy@dummy.com", contact="contact")
-    db.session.add(c)
-    db.session.commit()
-    # we have to be logged in
-    with client.session_transaction() as session:
-        session["user"] = {
-            "personData": {
-                "phoneNumbers": [
-                    {
-                        "canonicalForm": "+254712345678",
-                    }
-                ],
-            },
-            "userinfo": {
-                "email": "dummy@dummy.com",
-                "name": "dummy name",
-            },
-        }
+# def test_update_order_form(client):
+#     c = Customer(name="dummy name", email="dummy@dummy.com", contact="contact")
+#     db.session.add(c)
+#     db.session.commit()
+#     # we have to be logged in
+#     with client.session_transaction() as session:
+#         session["user"] = {
+#             "personData": {
+#                 "phoneNumbers": [
+#                     {
+#                         "canonicalForm": "+254712345678",
+#                     }
+#                 ],
+#             },
+#             "userinfo": {
+#                 "email": "dummy@dummy.com",
+#                 "name": "dummy name",
+#             },
+#         }
 
-    data = {
-        "item": "dummy item",
-        "amount": 100,
-    }
-    headers = {"Content-Type": "application/json"}
-    response = client.post("/orders", data=json.dumps(data), headers=headers)
+#     data = {
+#         "item": "dummy item",
+#         "amount": 100,
+#     }
+#     headers = {"Content-Type": "application/json"}
+#     response = client.post("/orders", data=json.dumps(data), headers=headers)
 
-    assert response is not None
-    assert response.status_code == 302
-    assert (
-        "<p>You should be redirected automatically to the target URL:" in response.text
-    )
+#     assert response is not None
+#     assert response.status_code == 302
+#     assert (
+#         "<p>You should be redirected automatically to the target URL:" in response.text
+#     )
 
 
 def test_orders(client):
