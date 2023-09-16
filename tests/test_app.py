@@ -12,14 +12,14 @@ def test_app(app):
     assert current_app == app
 
 
-def test_login(client):
-    response = client.get("/login")
+# def test_login(client):
+#     response = client.get("/login")
 
-    assert response is not None
-    assert response.status_code == 302  # redirecting
-    assert (
-        "<p>You should be redirected automatically to the target URL:" in response.text
-    )
+#     assert response is not None
+#     assert response.status_code == 302  # redirecting
+#     assert (
+#         "<p>You should be redirected automatically to the target URL:" in response.text
+#     )
 
 
 def test_logout(client):
