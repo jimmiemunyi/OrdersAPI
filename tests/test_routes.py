@@ -213,7 +213,7 @@ def test_delete_customers(client):
     response_2 = client.delete(f"/api/v1/customers/{2}")
 
     assert response is not None
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert "Customer deleted" in response.text
 
     assert response_2 is not None

@@ -40,13 +40,12 @@ def create_app(config=DevelopmentConfig):
         },
     )
 
-    africastalking.initialize(
-        username=app.config.get("AFRICASTALKING_USERNAME"),
-        api_key=app.config.get("AFRICASTALKING_API_KEY"),
-    )
-    app.sms_service = africastalking.SMS
-
     if not app.debug and not app.testing:
+        africastalking.initialize(
+            username=app.config.get("AFRICASTALKING_USERNAME"),
+            api_key=app.config.get("AFRICASTALKING_API_KEY"),
+        )
+        app.sms_service = africastalking.SMS
         if app.config["LOG_TO_STDOUT"]:
             stream_handler = logging.StreamHandler()
             stream_handler.setLevel(logging.INFO)
