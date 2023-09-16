@@ -31,6 +31,14 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+        
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U testuser && break
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 5
+          done
 
       - name: Run tests
         run: pytest tests/
