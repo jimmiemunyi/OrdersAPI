@@ -11,27 +11,37 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-        postgres:
-          image: postgres:15
-          env:
-            POSTGRES_USER: testuser
-            POSTGRES_PASSWORD: testpass
-            POSTGRES_DB: orders_api_db_test
+      postgres:
+        image: postgres:latest
+        env:
+            # postgresql setting
+          POSTGRES_DB: orders_api_db_test
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
           ports:
-            - 5432:5432
+            5432:5432
+            # Set health checks to wait until postgres has started
+          options:
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+    
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.10.12
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-        
+        run: |
+          python -m pip install -- upgrade pip
+          pip install -r requirements.txt
+
       - name: Wait for PostgreSQL to be ready
         run: |
           for i in $(seq 1 30); do
@@ -51,7 +61,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Heroku CLI
         run: |
