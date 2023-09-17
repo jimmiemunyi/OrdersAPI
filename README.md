@@ -194,7 +194,7 @@ Create a `.env` file in the root directory of the project. This file should matc
 
 ## Step 5: Set Up the Database
 
-Finally, set up the database by running the following commands:
+Set up the database by running the following commands:
 
 ```bash
 sudo su - postgres
@@ -207,6 +207,14 @@ Then, within the `psql` interface, run the following SQL commands:
 CREATE USER testuser WITH PASSWORD 'testpass';
 CREATE DATABASE orders_db WITH OWNER testuser ENCODING='UTF8';
 CREATE DATABASE orders_api_db_test WITH OWNER testuser ENCODING='UTF8';
+```
+
+## Step 6: Migrate the Database
+
+Finally migrat the database in order to have the correct tables with the following command:
+
+```bash
+flask db migrate
 ```
 
 After completing these steps, you should have a fully functional local development environment for the OrdersAPI.
