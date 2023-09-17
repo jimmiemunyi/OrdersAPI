@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome to the repository for the Orders API application. This platform is accessible via [this link](https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/). In addition to its primary functionality, this application also boasts a robust API layer. Detailed information about the supported endpoints can be found [here](https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/apidocs).
+Welcome to the repository for the Orders API application. This platform is accessible via <a href="https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/" target="_blank"> this link </a>. In addition to its primary functionality, this application also boasts a robust API layer. Detailed information about the supported endpoints can be found <a href="https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/apidocs" target="_blank">here </a>.
 
 This guide provides an in-depth overview of both the application's features and the underlying codebase.
 

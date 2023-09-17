@@ -52,9 +52,19 @@ jobs:
             sleep 5
           done
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: | 
-          pytest
+          coverage run -m pytest
+
+      - name: Generate coverage report
+        run: |
+          coverage report
+          coverage xml
+          
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build:
       name: Heroku Deploy
@@ -65,5 +75,5 @@ jobs:
         - uses: akhileshns/heroku-deploy@v3.12.14
           with:
             heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-            heroku_app_name: "jimmie-orders-api"
-            heroku_email: "jimmiemunyi@gmail.com"
+            heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+            heroku_email: ${{secrets.HEROKU_EMAIL}}
