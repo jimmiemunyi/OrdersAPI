@@ -1,5 +1,7 @@
 # Comprehensive Guide to Orders API
 
+[![codecov](https://codecov.io/gh/jimmiemunyi/OrdersAPI/graph/badge.svg?token=7LPIS8SCJX)](https://codecov.io/gh/jimmiemunyi/OrdersAPI)
+
 ## Introduction
 
 Welcome to the repository for the Orders API application. This platform is accessible via <a href="https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/" target="_blank"> this link </a>. In addition to its primary functionality, this application also boasts a robust API layer. Detailed information about the supported endpoints can be found <a href="https://jimmie-orders-api-e6327f2ac0f9.herokuapp.com/apidocs" target="_blank">here </a>.
