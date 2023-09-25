@@ -209,12 +209,12 @@ CREATE DATABASE orders_db WITH OWNER testuser ENCODING='UTF8';
 CREATE DATABASE orders_api_db_test WITH OWNER testuser ENCODING='UTF8';
 ```
 
-## Step 6: Migrate the Database
+## Step 6: Upgrade the Database
 
-Finally migrat the database in order to have the correct tables with the following command:
+Finally upgrade the database in order to have the correct tables with the following command:
 
 ```bash
-flask db migrate
+flask db upgrade
 ```
 
 After completing these steps, you should have a fully functional local development environment for the OrdersAPI.
